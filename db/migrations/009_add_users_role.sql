@@ -1,0 +1,4 @@
+-- Role for admin vs regular user (JWT + authorization).
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS role VARCHAR(32) NOT NULL DEFAULT 'user';

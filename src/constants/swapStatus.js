@@ -1,0 +1,10 @@
+const SWAP_STATUS = Object.freeze({
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+  WORKSHOP: "WORKSHOP",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+});
+
+module.exports = { SWAP_STATUS };

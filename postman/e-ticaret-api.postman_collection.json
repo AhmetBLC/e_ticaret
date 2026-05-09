@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "E-Ticaret API",
+    "description": "REST API for e-ticaret (Express + PostgreSQL). Base path: `/api`.\n\n**Auth:** JWT `Bearer` on protected routes. After **Login**, copy `data.token` into collection variable `token` (or use Tests tab script).\n\n**Responses:** Success `{ \"success\": true, \"data\": ... }`. Errors `{ \"success\": false, \"error\": { \"code\", \"message\", \"details?\" } }`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "token", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "swapId", "value": "" },
+    { "key": "workOrderId", "value": "" },
+    { "key": "variantId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password12\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register",
+            "description": "**201** `data.user` — no token; user must login."
+          }
+        },
+        {
+          "name": "POST Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password12\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "**200** `data.token`, `data.user`. Set `{{token}}` for other requests."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.success && json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "GET Profile (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/profile",
+            "description": "**200** `data.user` — `id`, `email`, `created_at`, `role`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "GET Products (public list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?page=1&limit=20",
+            "description": "**200** `data.products`, `data.pagination` (`page`, `limit`, `total`, `total_pages`)."
+          }
+        },
+        {
+          "name": "GET My products",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/products/me?page=1&limit=20",
+            "description": "**Auth required.** Same shape as public list; only caller's listings."
+          }
+        },
+        {
+          "name": "GET Product by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "**200** `data.product` with `variants` array."
+          }
+        },
+        {
+          "name": "POST Create product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample item\",\n  \"description\": \"Optional\",\n  \"price\": 99.99,\n  \"category_id\": null,\n  \"variants\": []\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "**201** `data.product`. `variants` optional array of `{ name, value, price, stock }`."
+          }
+        },
+        {
+          "name": "PUT Update product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"price\": 120.5\n}"
+            },
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "**200** `data.product`. At least one of title, description, price, category_id, variants."
+          }
+        },
+        {
+          "name": "DELETE Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "**200** `data.deleted`, `data.id`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "POST Create order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"variant_id\": \"{{variantId}}\", \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/orders",
+            "description": "**201** `data.order` with `items`."
+          }
+        },
+        {
+          "name": "GET My orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/orders?page=1&limit=20",
+            "description": "**200** `data.orders`, `data.pagination`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Swaps",
+      "item": [
+        {
+          "name": "POST Create swap",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_offered_id\": \"uuid-of-your-product\",\n  \"product_requested_id\": \"{{productId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/swaps",
+            "description": "**201** `data.swap`."
+          }
+        },
+        {
+          "name": "PUT Accept swap (receiver)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/swaps/{{swapId}}/accept",
+            "description": "**200** `data.swap`, optional `data.escrow`."
+          }
+        },
+        {
+          "name": "PUT Reject swap (receiver)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/swaps/{{swapId}}/reject",
+            "description": "**200** `data.swap`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Work orders (admin)",
+      "item": [
+        {
+          "name": "GET List work orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/workorders?page=1&limit=20",
+            "description": "**Admin JWT required.** **200** `data.work_orders`, `data.pagination`."
+          }
+        },
+        {
+          "name": "PUT Approve work order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/workorders/{{workOrderId}}/approve",
+            "description": "**200** `data.work_order`, optional `data.escrow`."
+          }
+        },
+        {
+          "name": "PUT Reject work order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/workorders/{{workOrderId}}/reject",
+            "description": "**200** `data.work_order`, optional `data.escrow`."
+          }
+        }
+      ]
+    }
+  ]
+}

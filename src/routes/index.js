@@ -1,0 +1,47 @@
+const express = require("express");
+const healthRoutes = require("./health.routes");
+const authRoutes = require("./auth.routes");
+const profileRoutes = require("./profile.routes");
+const categoryRoutes = require("./category.routes");
+const productRoutes = require("./product.routes");
+const orderRoutes = require("./order.routes");
+const swapRoutes = require("./swap.routes");
+const workOrderRoutes = require("./workOrder.routes");
+const adminRoutes = require("./admin.routes");
+const addressRoutes = require("./address.routes");
+const paymentRoutes = require("./payment.routes");
+const shipmentRoutes = require("./shipment.routes");
+const checkoutRoutes = require("./checkout.routes");
+const chatRoutes = require("./chat.routes");
+const reviewRoutes = require("./review.routes");
+const couponRoutes = require("./coupon.routes");
+const favoriteRoutes = require("./favorite.routes");
+const rmaRoutes = require("./rma.routes");
+const imageRoutes = require("./image.routes");
+const uploadRoutes = require("./upload.routes");
+
+const router = express.Router();
+
+router.use("/health", healthRoutes);
+router.use("/auth", authRoutes);
+router.use("/profile", profileRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/products", productRoutes);
+router.use("/orders", orderRoutes);
+router.use("/swaps", swapRoutes);
+router.use("/workorders", workOrderRoutes);
+router.use("/admin", adminRoutes);
+router.use("/addresses", addressRoutes);
+router.use("/payments", paymentRoutes);
+router.use("/shipments", shipmentRoutes);
+router.use("/checkout", checkoutRoutes);
+router.use("/chat", chatRoutes);
+router.use("/reviews", reviewRoutes);
+router.use("/coupons", couponRoutes);
+router.use("/favorites", favoriteRoutes);
+router.use("/returns", rmaRoutes);
+router.use("/rma", rmaRoutes);
+router.use("/product-images", imageRoutes);
+router.use("/upload", uploadRoutes);
+
+module.exports = router;
