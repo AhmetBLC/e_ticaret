@@ -273,9 +273,7 @@ async function rejectWorkOrder(workOrderId) {
       await productModel.setProductAvailable(swapRow.product_offered_id, client);
       await productModel.setProductAvailable(swapRow.product_requested_id, client);
     } else if (wo.order_id) {
-       // Order rejected by workshop. Products should probably become available again, 
-       // but for simplicity we rely on the user to re-list or handle refunds manually.
-       // We should at least refund the escrow.
+       const { ORDER_STATUS } = require("../constants/orderStatus");
        orderRow = await orderModel.findOrderById(wo.order_id, client);
        await orderModel.updateOrderFields(wo.order_id, { status: ORDER_STATUS.CANCELLED }, client);
     }
