@@ -229,7 +229,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(File(_pickedImages[index].path)),
+                                image: kIsWeb 
+                                    ? NetworkImage(_pickedImages[index].path) as ImageProvider
+                                    : FileImage(File(_pickedImages[index].path)),
                                 fit: BoxFit.cover,
                               ),
                             ),

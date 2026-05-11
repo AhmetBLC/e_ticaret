@@ -37,8 +37,8 @@ function getLogRequestBodiesEnabled() {
 }
 
 function getDatabaseSslOption() {
-  const enabled =
-    process.env.DATABASE_SSL === "true" || process.env.DATABASE_SSL === "1";
+  const raw = process.env.DATABASE_SSL || process.env.DB_SSL || "";
+  const enabled = raw === "true" || raw === "1";
   return enabled ? { rejectUnauthorized: false } : false;
 }
 
