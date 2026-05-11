@@ -15,6 +15,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/app_state_views.dart';
 import '../widgets/escrow_info_row.dart';
 import '../widgets/status_badges.dart';
+import '../../core/utils/status_mapper.dart';
 import 'product_detail_screen.dart';
 
 /// Simple admin area: dashboard, workshop queue (swap approvals), catalog overview.
@@ -790,7 +791,7 @@ class _CargoTabState extends State<_CargoTab> {
             _detailRow('Gönderici:', s.senderName ?? 'Bilinmiyor'),
             _detailRow('Alıcı:', s.receiverName ?? 'Bilinmiyor'),
             _detailRow('Taşıyıcı:', s.carrier),
-            _detailRow('Durum:', s.status),
+            _detailRow('Durum:', StatusMapper.getOrderStatusText(s.status)),
             _detailRow('Takip No:', s.trackingNumber),
             if (s.estimatedDelivery != null)
               _detailRow('Tahmini Varış:', s.estimatedDelivery!.toLocal().toString().split('.').first),

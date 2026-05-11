@@ -166,7 +166,7 @@ async function createOrder(userId, body) {
 async function getOrderByGuestCode(code) {
   const row = await orderModel.findOrderByGuestCode(code);
   if (!row) {
-    throw new AppError("ORDER_NOT_FOUND", "Sipariş bulunamadı.", 404);
+    throw new AppError("Sipariş bulunamadı.", 404, "ORDER_NOT_FOUND");
   }
   const items = await orderModel.findOrderItemsByOrderIds([row.id]);
   return serializeOrder(row, items);

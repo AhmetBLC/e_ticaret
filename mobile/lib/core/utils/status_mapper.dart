@@ -11,6 +11,14 @@ class StatusMapper {
         return 'Teslim Edildi';
       case 'CANCELLED':
         return 'İptal Edildi';
+      case 'LABEL_CREATED':
+        return 'Barkod Oluşturuldu';
+      case 'PICKED_UP':
+        return 'Kurye Teslim Aldı';
+      case 'IN_TRANSIT':
+        return 'Yolda';
+      case 'OUT_FOR_DELIVERY':
+        return 'Dağıtıma Çıktı';
       default:
         return status;
     }

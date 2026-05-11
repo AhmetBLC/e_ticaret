@@ -238,7 +238,7 @@ async function approveWorkOrder(workOrderId) {
       const items = await orderModel.findOrderItemsByOrderIds([wo.order_id]);
       for (const item of items) {
         // Mark product as sold/unavailable
-        await productModel.updateProductFields(item.product_id, { is_available: false }, client);
+        await productModel.updateProduct(item.product_id, { is_available: false }, client);
         
         const product = await productModel.findProductByIdForUpdate(item.product_id, client);
         if (product && orderRow) {

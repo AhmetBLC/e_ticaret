@@ -5,7 +5,7 @@ async function validateCoupon(code, cartTotal) {
   const coupon = await couponModel.findCouponByCode(code);
   
   if (!coupon) {
-    throw new AppError("INVALID_COUPON", "Geçersiz veya süresi dolmuş kupon.", 400);
+    throw new AppError("Geçersiz veya süresi dolmuş kupon.", 400, "INVALID_COUPON");
   }
 
   if (cartTotal < Number(coupon.min_purchase_amount)) {

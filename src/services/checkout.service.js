@@ -128,14 +128,6 @@ async function checkout(userId, {
       soldProductIds.add(ri.productId);
     }
 
-    // Mark purchased products as unavailable (remove from listings)
-    for (const productId of soldProductIds) {
-      await client.query(
-        "UPDATE products SET is_available = false WHERE id = $1",
-        [productId]
-      );
-    }
-
     // 4. Initiate payment
     let payment = await paymentService.initiatePayment(
       {

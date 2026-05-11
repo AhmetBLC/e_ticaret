@@ -5,7 +5,7 @@ const AppError = require("../utils/AppError");
 async function addReview(userId, productId, { rating, comment }) {
   const p = await productModel.findProductById(productId);
   if (!p) {
-    throw new AppError("PRODUCT_NOT_FOUND", "Ürün bulunamadı.", 404);
+    throw new AppError("Ürün bulunamadı.", 404, "PRODUCT_NOT_FOUND");
   }
 
   // Optional: Check if user actually bought the product

@@ -192,7 +192,7 @@ async function findProductsByUserPaginated({ userId, limit, offset }) {
 }
 
 async function updateProduct(id, fields, client) {
-  const allowed = ["title", "description", "price", "category_id", "image_url", "city", "district", "meta_title", "meta_description", "slug"];
+  const allowed = ["title", "description", "price", "category_id", "image_url", "city", "district", "meta_title", "meta_description", "slug", "is_available"];
   
   // If title is updated but slug is not explicitly provided, regenerate slug
   if (fields.title && !fields.slug) {

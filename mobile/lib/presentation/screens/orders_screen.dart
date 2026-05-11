@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../domain/providers/auth_provider.dart';
 
 import '../../core/navigation/app_route_observer.dart';
 import '../../core/network/error_mapper.dart';
@@ -324,32 +325,36 @@ class _OrdersScreenState extends State<OrdersScreen> with RouteAware {
                                     runSpacing: 8,
                                     alignment: WrapAlignment.end,
                                     children: [
-                                      if (o.status == OrderStatuses.pending)
-                                        FilledButton(
-                                          onPressed: () => _advanceStatus(
-                                            o.id,
-                                            OrderStatuses.shipped,
+                                      // Sadece ADMIN bu butonları görebilir
+                                      if (context.read<AuthProvider>().isAdmin) ...[
+                                        if (o.status == OrderStatuses.pending)
+                                          FilledButton(
+                                            onPressed: () => _advanceStatus(
+                                              o.id,
+                                              OrderStatuses.shipped,
+                                            ),
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor: AppColors.brand,
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              minimumSize: const Size(0, 36),
+                                            ),
+                                            child: Text('Kargoya Ver', style: GoogleFonts.poppins(fontSize: 12)),
                                           ),
-                                          style: FilledButton.styleFrom(
-                                            backgroundColor: AppColors.brand,
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                            minimumSize: const Size(0, 36),
+                                        if (o.status == OrderStatuses.shipped)
+                                          FilledButton(
+                                            onPressed: () => _advanceStatus(
+                                              o.id,
+                                              OrderStatuses.delivered,
+                                            ),
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor: AppColors.success,
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              minimumSize: const Size(0, 36),
+                                            ),
+                                            child: Text('Teslim Edildi', style: GoogleFonts.poppins(fontSize: 12)),
                                           ),
-                                          child: Text('Kargoya Ver', style: GoogleFonts.poppins(fontSize: 12)),
-                                        ),
-                                      if (o.status == OrderStatuses.shipped)
-                                        FilledButton(
-                                          onPressed: () => _advanceStatus(
-                                            o.id,
-                                            OrderStatuses.delivered,
-                                          ),
-                                          style: FilledButton.styleFrom(
-                                            backgroundColor: AppColors.success,
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                            minimumSize: const Size(0, 36),
-                                          ),
-                                          child: Text('Teslim Edildi', style: GoogleFonts.poppins(fontSize: 12)),
-                                        ),
+                                      ],
+                                      // İade et butonu alıcı için kalabilir
                                       if (o.status == OrderStatuses.delivered)
                                         OutlinedButton(
                                           onPressed: () => _requestReturn(o.id),
