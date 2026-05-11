@@ -223,13 +223,23 @@ async function approveWorkOrder(workOrderId) {
       );
       if (!swapRow) throw new AppError("Could not finalize swap", 409, "CONFLICT");
     } else if (wo.order_id) {
-      // Mark order as DELIVERED
+      // Normal order logic
       const { ORDER_STATUS } = require("../constants/orderStatus");
-      await orderModel.updateOrderFields(wo.order_id, { status: ORDER_STATUS.DELIVERED }, client);
+      orderRow = await orderModel.findOrderById(wo.order_id, client);
+      if (!orderRow) {
+         throw new AppError("Order not found", 404, "NOT_FOUND");
+      }
 
-      // Transfer ownership of products in the order to the buyer (orderRow.user_id)
+      // Mark order as SHIPPED (moved from pending) or handled by cargo simulation
+      // For now, workshop approval marks it ready for delivery
+      await orderModel.updateOrderFields(wo.order_id, { status: ORDER_STATUS.SHIPPED }, client);
+
+      // Transfer ownership and mark products as NOT available only now
       const items = await orderModel.findOrderItemsByOrderIds([wo.order_id]);
       for (const item of items) {
+        // Mark product as sold/unavailable
+        await productModel.updateProductFields(item.product_id, { is_available: false }, client);
+        
         const product = await productModel.findProductByIdForUpdate(item.product_id, client);
         if (product && orderRow) {
           await productModel.transferProductToUser(item.product_id, product.user_id, orderRow.user_id, client);

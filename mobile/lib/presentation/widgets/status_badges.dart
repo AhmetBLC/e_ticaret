@@ -144,18 +144,19 @@ class OrderStatusBadge extends StatelessWidget {
   }
 
   String get _label {
-    switch (status) {
-      case OrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return 'Beklemede';
-      case OrderStatuses.shipped:
+      case 'SHIPPED':
         return 'Kargoda';
-      case OrderStatuses.delivered:
+      case 'DELIVERED':
         return 'Teslim Edildi';
-      case OrderStatuses.returnRequested:
+      case 'RETURN_REQUESTED':
         return 'İade Talebi';
-      case OrderStatuses.returned:
+      case 'RETURNED':
         return 'İade Edildi';
-      case OrderStatuses.cancelled:
+      case 'CANCELLED':
         return 'İptal Edildi';
       default:
         return status;
@@ -163,15 +164,17 @@ class OrderStatusBadge extends StatelessWidget {
   }
 
   Color get _color {
-    switch (status) {
-      case OrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return AppColors.warning;
-      case OrderStatuses.shipped:
-      case OrderStatuses.delivered:
+      case 'SHIPPED':
         return AppColors.info;
-      case OrderStatuses.returned:
-      case OrderStatuses.cancelled:
-      case OrderStatuses.returnRequested:
+      case 'DELIVERED':
+        return AppColors.success;
+      case 'RETURNED':
+      case 'CANCELLED':
+      case 'RETURN_REQUESTED':
         return AppColors.error;
       default:
         return Colors.grey;
@@ -179,17 +182,18 @@ class OrderStatusBadge extends StatelessWidget {
   }
 
   IconData? get _icon {
-    switch (status) {
-      case OrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return Icons.schedule_rounded;
-      case OrderStatuses.shipped:
+      case 'SHIPPED':
         return Icons.local_shipping_rounded;
-      case OrderStatuses.delivered:
+      case 'DELIVERED':
         return Icons.check_circle_outline_rounded;
-      case OrderStatuses.returnRequested:
+      case 'RETURN_REQUESTED':
         return Icons.assignment_return_rounded;
-      case OrderStatuses.returned:
-      case OrderStatuses.cancelled:
+      case 'RETURNED':
+      case 'CANCELLED':
         return Icons.cancel_outlined;
       default:
         return Icons.info_outline_rounded;
@@ -213,16 +217,17 @@ class ShipmentStatusBadge extends StatelessWidget {
   }
 
   String get _label {
-    switch (status) {
-      case CargoStatuses.preparing:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PREPARING':
         return 'Hazırlanıyor';
-      case CargoStatuses.inTransit:
+      case 'IN_TRANSIT':
         return 'Yolda';
-      case CargoStatuses.outForDelivery:
+      case 'OUT_FOR_DELIVERY':
         return 'Dağıtıma Çıktı';
-      case CargoStatuses.delivered:
+      case 'DELIVERED':
         return 'Teslim Edildi';
-      case CargoStatuses.failedAttempt:
+      case 'FAILED_ATTEMPT':
         return 'Teslim Edilemedi';
       default:
         return status;
@@ -230,15 +235,16 @@ class ShipmentStatusBadge extends StatelessWidget {
   }
 
   Color get _color {
-    switch (status) {
-      case CargoStatuses.preparing:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PREPARING':
         return AppColors.warning;
-      case CargoStatuses.inTransit:
-      case CargoStatuses.outForDelivery:
+      case 'IN_TRANSIT':
+      case 'OUT_FOR_DELIVERY':
         return AppColors.info;
-      case CargoStatuses.delivered:
+      case 'DELIVERED':
         return AppColors.success;
-      case CargoStatuses.failedAttempt:
+      case 'FAILED_ATTEMPT':
         return AppColors.error;
       default:
         return Colors.grey;
@@ -246,16 +252,17 @@ class ShipmentStatusBadge extends StatelessWidget {
   }
 
   IconData? get _icon {
-    switch (status) {
-      case CargoStatuses.preparing:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PREPARING':
         return Icons.inventory_2_rounded;
-      case CargoStatuses.inTransit:
+      case 'IN_TRANSIT':
         return Icons.local_shipping_rounded;
-      case CargoStatuses.outForDelivery:
+      case 'OUT_FOR_DELIVERY':
         return Icons.hail_rounded;
-      case CargoStatuses.delivered:
+      case 'DELIVERED':
         return Icons.done_all_rounded;
-      case CargoStatuses.failedAttempt:
+      case 'FAILED_ATTEMPT':
         return Icons.error_outline_rounded;
       default:
         return Icons.info_outline_rounded;
@@ -279,14 +286,18 @@ class WorkOrderStatusBadge extends StatelessWidget {
   }
 
   String get _label {
-    switch (status) {
-      case WorkOrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return 'Bekliyor';
-      case WorkOrderStatuses.inProgress:
+      case 'IN_PROGRESS':
         return 'İşleniyor';
-      case WorkOrderStatuses.completed:
-        return 'Tamamlandı';
-      case WorkOrderStatuses.cancelled:
+      case 'COMPLETED':
+      case 'APPROVED':
+        return 'Onaylandı';
+      case 'REJECTED':
+        return 'Reddedildi';
+      case 'CANCELLED':
         return 'İptal Edildi';
       default:
         return status;
@@ -294,14 +305,17 @@ class WorkOrderStatusBadge extends StatelessWidget {
   }
 
   Color get _color {
-    switch (status) {
-      case WorkOrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return AppColors.warning;
-      case WorkOrderStatuses.inProgress:
+      case 'IN_PROGRESS':
         return AppColors.info;
-      case WorkOrderStatuses.completed:
+      case 'COMPLETED':
+      case 'APPROVED':
         return AppColors.success;
-      case WorkOrderStatuses.cancelled:
+      case 'REJECTED':
+      case 'CANCELLED':
         return AppColors.error;
       default:
         return Colors.grey;
@@ -309,14 +323,17 @@ class WorkOrderStatusBadge extends StatelessWidget {
   }
 
   IconData? get _icon {
-    switch (status) {
-      case WorkOrderStatuses.pending:
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING':
         return Icons.schedule_rounded;
-      case WorkOrderStatuses.inProgress:
+      case 'IN_PROGRESS':
         return Icons.build_circle_outlined;
-      case WorkOrderStatuses.completed:
+      case 'COMPLETED':
+      case 'APPROVED':
         return Icons.check_circle_outline_rounded;
-      case WorkOrderStatuses.cancelled:
+      case 'REJECTED':
+      case 'CANCELLED':
         return Icons.cancel_outlined;
       default:
         return Icons.info_outline_rounded;
