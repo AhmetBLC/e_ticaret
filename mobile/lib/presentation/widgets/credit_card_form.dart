@@ -21,6 +21,14 @@ class CreditCardFormState extends State<CreditCardForm> {
   final _cardBrandController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _cardNumberController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     _cardNumberController.dispose();
     _cardBrandController.dispose();
@@ -38,6 +46,27 @@ class CreditCardFormState extends State<CreditCardForm> {
       lastFour: number.substring(number.length - 4),
       brand: brand,
     );
+  }
+
+  String _getFormattedCardNumber() {
+    String text = _cardNumberController.text.replaceAll(' ', '');
+    if (text.isEmpty) return '**** **** **** ****';
+    
+    String formatted = '';
+    for (int i = 0; i < text.length; i++) {
+      if (i > 0 && i % 4 == 0) formatted += ' ';
+      formatted += text[i];
+    }
+    
+    // Fill remaining with *
+    int remaining = 16 - text.length;
+    for (int i = 0; i < remaining; i++) {
+      int totalLen = text.length + i;
+      if (totalLen > 0 && totalLen % 4 == 0) formatted += ' ';
+      formatted += '*';
+    }
+    
+    return formatted;
   }
 
   @override
@@ -105,11 +134,11 @@ class CreditCardFormState extends State<CreditCardForm> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '**** **** **** ****',
+                    _getFormattedCardNumber(),
                     style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 22,
-                      letterSpacing: 4,
+                      fontSize: 19, // Biraz küçülttüm ki sığsın
+                      letterSpacing: 2.5,
                     ),
                   ),
                   const SizedBox(height: 8),
