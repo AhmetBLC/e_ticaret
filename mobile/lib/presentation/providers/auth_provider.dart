@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/constants/user_roles.dart';
 import '../../core/debug/app_debug_log.dart';
 import '../../core/network/api_exception.dart';
 import '../../data/models/user_model.dart';
@@ -22,6 +23,7 @@ class AuthProvider extends ChangeNotifier {
   bool get submitting => _submitting;
   String? get error => _error;
   bool get isAuthenticated => _user != null;
+  bool get isAdmin => _user?.role == UserRoles.admin;
 
   Future<void> _restore() async {
     appDebugLog('Auth', 'restoreSession.start');
