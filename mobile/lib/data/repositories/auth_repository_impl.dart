@@ -22,7 +22,10 @@ class AuthRepositoryImpl implements AuthRepository {
       throw ApiException('No token in login response');
     }
     await _session.writeToken(token);
-    final userJson = data['user'] as Map<String, dynamic>;
+    final userJson = data['user'] as Map<String, dynamic>?;
+    if (userJson == null) {
+      throw ApiException('Sunucudan kullanıcı verisi alınamadı');
+    }
     final user = UserModel.fromJson(userJson);
     await _session.cacheUser(user);
     return user;
@@ -51,7 +54,10 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     try {
       final data = await _remote.fetchProfile();
-      final userJson = data['user'] as Map<String, dynamic>;
+      final userJson = data['user'] as Map<String, dynamic>?;
+      if (userJson == null) {
+        throw ApiException('Profil verisi alınamadı');
+      }
       final user = UserModel.fromJson(userJson);
       await _session.cacheUser(user);
       return user;

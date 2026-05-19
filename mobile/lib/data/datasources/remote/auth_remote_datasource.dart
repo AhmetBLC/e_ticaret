@@ -13,7 +13,9 @@ class AuthRemoteDatasource {
       'email': email,
       'password': password,
     });
-    return body['data'] as Map<String, dynamic>;
+    final data = body['data'];
+    if (data == null) return {};
+    return data as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> register({
@@ -24,12 +26,16 @@ class AuthRemoteDatasource {
       'email': email,
       'password': password,
     });
-    return body['data'] as Map<String, dynamic>;
+    final data = body['data'];
+    if (data == null) return {};
+    return data as Map<String, dynamic>;
   }
 
   /// `GET /profile` — requires Bearer token.
   Future<Map<String, dynamic>> fetchProfile() async {
     final body = await _client.get('profile');
-    return body['data'] as Map<String, dynamic>;
+    final data = body['data'];
+    if (data == null) return {};
+    return data as Map<String, dynamic>;
   }
 }

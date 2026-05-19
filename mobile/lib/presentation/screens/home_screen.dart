@@ -12,7 +12,9 @@ import '../widgets/app_state_views.dart';
 import '../widgets/product_card.dart';
 import 'auth_screen.dart';
 import 'favorites_screen.dart';
+import '../widgets/auth_required.dart';
 import 'product_detail_screen.dart';
+import '../widgets/responsive_wrapper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -343,44 +345,57 @@ class _HomeScreenState extends State<HomeScreen> {
                     horizontal: AppSpacing.lg,
                     vertical: AppSpacing.sm,
                   ),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.68,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index >= catalog.products.length) {
-                          return const Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.brand,
-                              ),
-                            ),
-                          );
-                        }
-                        final p = catalog.products[index];
-                        return ProductCard(
-                          product: p,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ProductDetailScreen(productId: p.id),
-                              ),
+                  sliver: SliverLayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.crossAxisExtent;
+                      int crossAxisCount = 2;
+                      if (width > 1200) {
+                        crossAxisCount = 5;
+                      } else if (width > 900) {
+                        crossAxisCount = 4;
+                      } else if (width > 600) {
+                        crossAxisCount = 3;
+                      }
+
+                      return SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.68,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index >= catalog.products.length) {
+                              return const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.brand,
+                                  ),
+                                ),
+                              );
+                            }
+                            final p = catalog.products[index];
+                            return ProductCard(
+                              product: p,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        ProductDetailScreen(productId: p.id),
+                                  ),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      childCount:
-                          catalog.products.length + (catalog.hasMore ? 1 : 0),
-                    ),
+                          childCount: catalog.products.length +
+                              (catalog.hasMore ? 1 : 0),
+                        ),
+                      );
+                    },
                   ),
                 ),
 
@@ -457,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).pushNamed(AppRoutes.swaps);
             } else if (index == 3) {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+                MaterialPageRoute(builder: (_) => const AuthRequired(child: FavoritesScreen())),
               );
             } else if (index == 4) {
               Navigator.of(context).pushNamed(AppRoutes.account);

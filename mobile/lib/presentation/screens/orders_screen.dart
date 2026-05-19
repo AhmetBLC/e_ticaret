@@ -12,6 +12,7 @@ import '../../data/models/pagination_model.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../widgets/app_state_views.dart';
 import '../widgets/status_badges.dart';
+import '../widgets/responsive_wrapper.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -154,229 +155,232 @@ class _OrdersScreenState extends State<OrdersScreen> with RouteAware {
           ],
         ),
       ),
-      body: RefreshIndicator(
-        color: AppColors.brand,
-        onRefresh: () async {
-          _refresh();
-          await _future;
-        },
-        child: FutureBuilder(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const AppLoadingBody(message: 'Siparişler yükleniyor…');
-            }
-            if (snapshot.hasError) {
-              return AppRefreshableScrollable(
-                child: AppErrorState(
-                  message: userFacingErrorMessage(snapshot.error!),
-                  onRetry: _refresh,
-                ),
-              );
-            }
-            final orders = snapshot.data!.orders;
-            if (orders.isEmpty) {
-              return AppRefreshableScrollable(
-                child: const AppEmptyState(
-                  icon: Icons.receipt_long_rounded,
-                  title: 'Henüz sipariş yok',
-                  subtitle: 'Satın aldığınız ürünler burada listelenir.',
-                ),
-              );
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              itemCount: orders.length,
-              itemBuilder: (context, i) {
-                final o = orders[i];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                    border: Border.all(
-                      color: isDark ? AppColors.darkDivider.withOpacity(0.5) : const Color(0xFFE8E8E8),
-                      width: 0.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+      body: ResponsiveWrapper(
+        maxWidth: 700,
+        child: RefreshIndicator(
+          color: AppColors.brand,
+          onRefresh: () async {
+            _refresh();
+            await _future;
+          },
+          child: FutureBuilder(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const AppLoadingBody(message: 'Siparişler yükleniyor…');
+              }
+              if (snapshot.hasError) {
+                return AppRefreshableScrollable(
+                  child: AppErrorState(
+                    message: userFacingErrorMessage(snapshot.error!),
+                    onRetry: _refresh,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.brand.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
+                );
+              }
+              final orders = snapshot.data!.orders;
+              if (orders.isEmpty) {
+                return AppRefreshableScrollable(
+                  child: const AppEmptyState(
+                    icon: Icons.receipt_long_rounded,
+                    title: 'Henüz sipariş yok',
+                    subtitle: 'Satın aldığınız ürünler burada listelenir.',
+                  ),
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                itemCount: orders.length,
+                itemBuilder: (context, i) {
+                  final o = orders[i];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCard : AppColors.lightCard,
+                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                      border: Border.all(
+                        color: isDark ? AppColors.darkDivider.withOpacity(0.5) : const Color(0xFFE8E8E8),
+                        width: 0.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.brand.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(Icons.inventory_2_rounded, color: AppColors.brand, size: 20),
                               ),
-                              child: Icon(Icons.inventory_2_rounded, color: AppColors.brand, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Sipariş #${o.id.substring(0, 8).toUpperCase()}',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${o.items.length} kalem · '
+                                      '${o.createdAt.toLocal().toString().split('.').first}',
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              OrderStatusBadge(status: o.status),
+                            ],
+                          ),
+                          if (o.trackingNumber != null &&
+                              o.trackingNumber!.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    'Sipariş #${o.id.substring(0, 8).toUpperCase()}',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.local_shipping_rounded,
+                                      size: 16,
+                                      color: AppColors.brand,
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${o.items.length} kalem · '
-                                    '${o.createdAt.toLocal().toString().split('.').first}',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Kargo Takip No',
+                                              style: theme.textTheme.labelSmall?.copyWith(
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                            if (o.cargoStatus != null)
+                                              ShipmentStatusBadge(status: o.cargoStatus!),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        SelectableText(
+                                          o.trackingNumber!,
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            color: theme.colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            OrderStatusBadge(status: o.status),
                           ],
-                        ),
-                        if (o.trackingNumber != null &&
-                            o.trackingNumber!.isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.local_shipping_rounded,
-                                    size: 16,
-                                    color: AppColors.brand,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Kargo Takip No',
-                                            style: theme.textTheme.labelSmall?.copyWith(
-                                              color: theme.colorScheme.onSurfaceVariant,
+                          if (o.status == OrderStatuses.pending ||
+                              o.status == OrderStatuses.shipped ||
+                              o.status == OrderStatuses.delivered) ...[
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: _busyOrderIds.contains(o.id)
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.brand,
+                                      ),
+                                    )
+                                  : Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      alignment: WrapAlignment.end,
+                                      children: [
+                                        // Sadece ADMIN bu butonları görebilir
+                                        if (context.read<AuthProvider>().isAdmin) ...[
+                                          if (o.status == OrderStatuses.pending)
+                                            FilledButton(
+                                              onPressed: () => _advanceStatus(
+                                                o.id,
+                                                OrderStatuses.shipped,
+                                              ),
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: AppColors.brand,
+                                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                                minimumSize: const Size(0, 36),
+                                              ),
+                                              child: Text('Kargoya Ver', style: GoogleFonts.poppins(fontSize: 12)),
                                             ),
-                                          ),
-                                          if (o.cargoStatus != null)
-                                            ShipmentStatusBadge(status: o.cargoStatus!),
+                                          if (o.status == OrderStatuses.shipped)
+                                            FilledButton(
+                                              onPressed: () => _advanceStatus(
+                                                o.id,
+                                                OrderStatuses.delivered,
+                                              ),
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: AppColors.success,
+                                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                                minimumSize: const Size(0, 36),
+                                              ),
+                                              child: Text('Teslim Edildi', style: GoogleFonts.poppins(fontSize: 12)),
+                                            ),
                                         ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      SelectableText(
-                                        o.trackingNumber!,
-                                        style: GoogleFonts.poppins(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
-                                          color: theme.colorScheme.onSurface,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        if (o.status == OrderStatuses.pending ||
-                            o.status == OrderStatuses.shipped ||
-                            o.status == OrderStatuses.delivered) ...[
-                          const SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: _busyOrderIds.contains(o.id)
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.brand,
-                                    ),
-                                  )
-                                : Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    alignment: WrapAlignment.end,
-                                    children: [
-                                      // Sadece ADMIN bu butonları görebilir
-                                      if (context.read<AuthProvider>().isAdmin) ...[
-                                        if (o.status == OrderStatuses.pending)
-                                          FilledButton(
-                                            onPressed: () => _advanceStatus(
-                                              o.id,
-                                              OrderStatuses.shipped,
-                                            ),
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: AppColors.brand,
+                                        // İade et butonu alıcı için kalabilir
+                                        if (o.status == OrderStatuses.delivered)
+                                          OutlinedButton(
+                                            onPressed: () => _requestReturn(o.id),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: AppColors.error,
+                                              side: const BorderSide(color: AppColors.error),
                                               padding: const EdgeInsets.symmetric(horizontal: 16),
                                               minimumSize: const Size(0, 36),
                                             ),
-                                            child: Text('Kargoya Ver', style: GoogleFonts.poppins(fontSize: 12)),
-                                          ),
-                                        if (o.status == OrderStatuses.shipped)
-                                          FilledButton(
-                                            onPressed: () => _advanceStatus(
-                                              o.id,
-                                              OrderStatuses.delivered,
-                                            ),
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: AppColors.success,
-                                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                                              minimumSize: const Size(0, 36),
-                                            ),
-                                            child: Text('Teslim Edildi', style: GoogleFonts.poppins(fontSize: 12)),
+                                            child: Text('İade Et', style: GoogleFonts.poppins(fontSize: 12)),
                                           ),
                                       ],
-                                      // İade et butonu alıcı için kalabilir
-                                      if (o.status == OrderStatuses.delivered)
-                                        OutlinedButton(
-                                          onPressed: () => _requestReturn(o.id),
-                                          style: OutlinedButton.styleFrom(
-                                            foregroundColor: AppColors.error,
-                                            side: const BorderSide(color: AppColors.error),
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                            minimumSize: const Size(0, 36),
-                                          ),
-                                          child: Text('İade Et', style: GoogleFonts.poppins(fontSize: 12)),
-                                        ),
-                                    ],
-                                  ),
-                          ),
+                                    ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            );
-          },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );

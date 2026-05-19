@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +22,9 @@ class SessionStorage {
   static const _userKey = 'cached_user_json';
 
   Future<String?> readToken() async {
+    if (kIsWeb) {
+      return _prefs.getString(_secureTokenKey);
+    }
     final secure = await _secure.read(key: _secureTokenKey);
     if (secure != null && secure.isNotEmpty) {
       return secure;
@@ -35,6 +39,15 @@ class SessionStorage {
   }
 
   Future<void> writeToken(String? token) async {
+    if (kIsWeb) {
+      if (token == null || token.isEmpty) {
+        await _prefs.remove(_secureTokenKey);
+      } else {
+        await _prefs.setString(_secureTokenKey, token);
+      }
+      return;
+    }
+
     if (token == null || token.isEmpty) {
       await _secure.delete(key: _secureTokenKey);
       await _prefs.remove(_legacyPrefsTokenKey);

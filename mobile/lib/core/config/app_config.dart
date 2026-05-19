@@ -14,11 +14,11 @@ class AppConfig {
       return fromEnv;
     }
     if (kIsWeb) {
-      return 'http://13.62.45.24:5000/api';
+      return 'https://api.takasapp.info.tr/api';
     }
     if (Platform.isAndroid) {
-      return 'http://13.62.45.24:5000/api';
+      return 'https://api.takasapp.info.tr/api';
     }
-    return 'http://13.62.45.24:5000/api';
+    return 'https://api.takasapp.info.tr/api';
   }
 }

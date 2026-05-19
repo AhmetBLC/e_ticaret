@@ -264,8 +264,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Image Gallery ───────────────────────────
-                AspectRatio(
-                  aspectRatio: 1,
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 500),
+                    child: AspectRatio(
+                    aspectRatio: 1,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -357,6 +360,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                     ],
                   ),
+                ),
+                ),
                 ),
 
                 // ── Product Info ────────────────────────────

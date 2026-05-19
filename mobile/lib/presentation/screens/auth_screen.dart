@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../widgets/responsive_wrapper.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
@@ -50,12 +51,13 @@ class _AuthScreenState extends State<AuthScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+      body: ResponsiveWrapper(
+        maxWidth: 500,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Column(
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 60),
               // Brand Logo
               Container(
                 width: 80,
@@ -206,7 +208,7 @@ class _AuthScreenState extends State<AuthScreen>
                 border: Border.all(color: AppColors.error.withOpacity(0.3)),
               ),
               child: Text(
-                auth.error!,
+                auth.error ?? 'Bir hata oluştu',
                 style: TextStyle(color: AppColors.error, fontSize: 13),
               ),
             ),
@@ -236,7 +238,7 @@ class _AuthScreenState extends State<AuthScreen>
                     ? null
                     : () async {
                         auth.clearError();
-                        if (!_formLogin.currentState!.validate()) {
+                        if (!(_formLogin.currentState?.validate() ?? false)) {
                           return;
                         }
                         final ok = await auth.login(
@@ -329,7 +331,7 @@ class _AuthScreenState extends State<AuthScreen>
                 border: Border.all(color: AppColors.error.withOpacity(0.3)),
               ),
               child: Text(
-                auth.error!,
+                auth.error ?? 'Bir hata oluştu',
                 style: TextStyle(color: AppColors.error, fontSize: 13),
               ),
             ),
@@ -359,7 +361,7 @@ class _AuthScreenState extends State<AuthScreen>
                     ? null
                     : () async {
                         auth.clearError();
-                        if (!_formReg.currentState!.validate()) {
+                        if (!(_formReg.currentState?.validate() ?? false)) {
                           return;
                         }
                         final ok = await auth.register(

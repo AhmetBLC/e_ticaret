@@ -8,6 +8,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../domain/repositories/order_repository.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/responsive_wrapper.dart';
 
 /// Example **protected** destination: only reachable with a valid session when wrapped in [AuthRequired].
 class AccountScreen extends StatelessWidget {
@@ -24,230 +25,233 @@ class AccountScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Hesabım'),
       ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: context.read<OrderRepository>().getStats(),
-        builder: (context, snapshot) {
-          final stats = snapshot.data;
-          
-          return ListView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            children: [
-              // ── Profile Card ────────────────────────────
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: AppColors.brandGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.brand.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 2,
+      body: ResponsiveWrapper(
+        maxWidth: 600,
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: context.read<OrderRepository>().getStats(),
+          builder: (context, snapshot) {
+            final stats = snapshot.data;
+            
+            return ListView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              children: [
+                // ── Profile Card ────────────────────────────
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.brandGradient,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.brand.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.person_rounded,
+                          size: 30,
+                          color: Colors.white,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.lg),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.email,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                      const SizedBox(width: AppSpacing.lg),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.email,
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          if (user.role != null) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                user.role!,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(0.9),
+                            if (user.role != null) ...[
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  user.role!,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              
-              if (snapshot.connectionState == ConnectionState.waiting)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: CircularProgressIndicator(color: AppColors.brand),
+                    ],
                   ),
-                )
-              else if (stats != null) ...[
-                // ── Sales Performance ─────────────────────
-                _SectionTitle(title: 'Satış Performansım'),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _StatCard(
-                      label: 'Toplam Kazanç',
-                      value: '${stats['user_earnings'] ?? 0} ₺',
-                      icon: Icons.payments_rounded,
-                      gradient: AppColors.accentGradient,
-                    ),
-                    const SizedBox(width: 12),
-                    _StatCard(
-                      label: 'Satılan Ürün',
-                      value: '${stats['user_sales_count'] ?? 0}',
-                      icon: Icons.shopping_basket_rounded,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                      ),
-                    ),
-                  ],
                 ),
+                const SizedBox(height: AppSpacing.xl),
                 
-                if (user.role == UserRoles.admin && stats['admin_total_sales'] != null) ...[
-                  const SizedBox(height: AppSpacing.xxl),
-                  _SectionTitle(title: 'Yönetici Özeti'),
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(color: AppColors.brand),
+                    ),
+                  )
+                else if (stats != null) ...[
+                  // ── Sales Performance ─────────────────────
+                  _SectionTitle(title: 'Satış Performansım'),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       _StatCard(
-                        label: 'Brüt Ciro',
-                        value: '${stats['admin_total_sales'] ?? 0} ₺',
-                        icon: Icons.account_balance_rounded,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
-                        ),
+                        label: 'Toplam Kazanç',
+                        value: '${stats['user_earnings'] ?? 0} ₺',
+                        icon: Icons.payments_rounded,
+                        gradient: AppColors.accentGradient,
                       ),
                       const SizedBox(width: 12),
                       _StatCard(
-                        label: 'Sipariş Sayısı',
-                        value: '${stats['admin_order_count'] ?? 0}',
-                        icon: Icons.receipt_long_rounded,
-                        gradient: AppColors.brandGradient,
+                        label: 'Satılan Ürün',
+                        value: '${stats['user_sales_count'] ?? 0}',
+                        icon: Icons.shopping_basket_rounded,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                        ),
                       ),
                     ],
                   ),
-                ],
-              ],
-
-              const SizedBox(height: AppSpacing.xxl),
-              _SectionTitle(title: 'İşlemlerim'),
-              const SizedBox(height: 12),
-              _MenuTile(
-                icon: Icons.shopping_bag_rounded,
-                title: 'Siparişlerim',
-                subtitle: 'Satın aldığım ve sattığım ürünler',
-                gradient: AppColors.brandGradient,
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
-              ),
-              _MenuTile(
-                icon: Icons.swap_horiz_rounded,
-                title: 'Takas Tekliflerim',
-                subtitle: 'Gelen ve giden takas istekleri',
-                gradient: AppColors.accentGradient,
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.swaps),
-              ),
-              _MenuTile(
-                icon: Icons.chat_rounded,
-                title: 'Mesajlarım',
-                subtitle: 'Alıcı ve satıcılarla olan görüşmeler',
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                ),
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.conversations),
-              ),
-              if (user.role == UserRoles.admin) ...[
-                const SizedBox(height: 16),
-                _SectionTitle(title: 'Yönetici'),
-                const SizedBox(height: 12),
-                _MenuTile(
-                  icon: Icons.admin_panel_settings_rounded,
-                  title: 'Yönetim Paneli',
-                  subtitle: 'Atölye kuyruğu ve platform yönetimi',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFEF4444), Color(0xFFEC4899)],
-                  ),
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.admin),
-                ),
-              ],
-
-              const SizedBox(height: AppSpacing.xxxl),
-              // ── Logout Button ───────────────────────────
-              Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  border: Border.all(
-                    color: AppColors.error.withOpacity(0.5),
-                    width: 1.5,
-                  ),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                    onTap: () async {
-                      await auth.logout();
-                      if (context.mounted) {
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  
+                  if (user.role == UserRoles.admin && stats['admin_total_sales'] != null) ...[
+                    const SizedBox(height: AppSpacing.xxl),
+                    _SectionTitle(title: 'Yönetici Özeti'),
+                    const SizedBox(height: 12),
+                    Row(
                       children: [
-                        Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Çıkış Yap',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.error,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                        _StatCard(
+                          label: 'Brüt Ciro',
+                          value: '${stats['admin_total_sales'] ?? 0} ₺',
+                          icon: Icons.account_balance_rounded,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
                           ),
+                        ),
+                        const SizedBox(width: 12),
+                        _StatCard(
+                          label: 'Sipariş Sayısı',
+                          value: '${stats['admin_order_count'] ?? 0}',
+                          icon: Icons.receipt_long_rounded,
+                          gradient: AppColors.brandGradient,
                         ),
                       ],
                     ),
+                  ],
+                ],
+
+                const SizedBox(height: AppSpacing.xxl),
+                _SectionTitle(title: 'İşlemlerim'),
+                const SizedBox(height: 12),
+                _MenuTile(
+                  icon: Icons.shopping_bag_rounded,
+                  title: 'Siparişlerim',
+                  subtitle: 'Satın aldığım ve sattığım ürünler',
+                  gradient: AppColors.brandGradient,
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.orders),
+                ),
+                _MenuTile(
+                  icon: Icons.swap_horiz_rounded,
+                  title: 'Takas Tekliflerim',
+                  subtitle: 'Gelen ve giden takas istekleri',
+                  gradient: AppColors.accentGradient,
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.swaps),
+                ),
+                _MenuTile(
+                  icon: Icons.chat_rounded,
+                  title: 'Mesajlarım',
+                  subtitle: 'Alıcı ve satıcılarla olan görüşmeler',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                  ),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.conversations),
+                ),
+                if (user.role == UserRoles.admin) ...[
+                  const SizedBox(height: 16),
+                  _SectionTitle(title: 'Yönetici'),
+                  const SizedBox(height: 12),
+                  _MenuTile(
+                    icon: Icons.admin_panel_settings_rounded,
+                    title: 'Yönetim Paneli',
+                    subtitle: 'Atölye kuyruğu ve platform yönetimi',
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFEF4444), Color(0xFFEC4899)],
+                    ),
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.admin),
+                  ),
+                ],
+
+                const SizedBox(height: AppSpacing.xxxl),
+                // ── Logout Button ───────────────────────────
+                Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    border: Border.all(
+                      color: AppColors.error.withOpacity(0.5),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                      onTap: () async {
+                        await auth.logout();
+                        if (context.mounted) {
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Çıkış Yap',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.error,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
-            ],
-          );
-        },
+                const SizedBox(height: 32),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
